@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K-BAR</title>
+  <meta name="description" content="K-BAR: el carrito de snacks que convierte cualquier evento en una fiesta. Bodas, cumpleaños, eventos corporativos y más.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink: #ff2e7e;
+      --orange: #ff8a00;
+      --yellow: #ffd23f;
+      --purple: #6c2bd9;
+      --dark: #1a1033;
+      --text: #2b2340;
+      --muted: #6b6480;
+      --bg: #fffaf3;
+      --card: #ffffff;
+      --radius: 22px;
+      --shadow: 0 12px 40px rgba(26, 16, 51, 0.10);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    h1, h2, h3, .logo { font-family: 'Bricolage Grotesque', sans-serif; line-height: 1.1; }
+    a { color: inherit; text-decoration: none; }
+    .container { width: min(1140px, 100% - 32px); margin-inline: auto; }
+
+    /* ---------- Botones ---------- */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 28px; border-radius: 999px; font-weight: 600;
+      border: none; cursor: pointer; font-size: 1rem;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn:hover { transform: translateY(-3px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      color: #fff; box-shadow: 0 10px 25px rgba(255, 46, 126, .35);
+    }
+    .btn-outline { background: #fff; color: var(--dark); border: 2px solid var(--dark); }
+
+    /* ---------- Navbar ---------- */
+    nav {
+      position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50;
+      background: rgba(255, 250, 243, .85); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(26, 16, 51, .06);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+    .logo { font-size: 1.8rem; font-weight: 800; color: var(--dark); }
+    .logo span { color: var(--pink); }
+    .nav-links { display: flex; gap: 32px; list-style: none; font-weight: 500; }
+    .nav-links a:hover { color: var(--pink); }
+    .menu-toggle { display: none; background: none; border: none; font-size: 1.8rem; cursor: pointer; color: var(--dark); }
+
+    /* ---------- Hero ---------- */
+    .hero { position: relative; padding: 80px 0 100px; overflow: hidden; }
+    .hero::before {
+      content: ""; position: absolute; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 210, 63, .45), transparent 70%);
+      top: -200px; right: -150px; z-index: -1;
+    }
+    .hero-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 48px; align-items: center; }
+    .badge {
+      display: inline-block; background: #fff; padding: 8px 16px; border-radius: 999px;
+      font-weight: 600; font-size: .9rem; box-shadow: var(--shadow); margin-bottom: 24px;
+    }
+    .hero h1 { font-size: clamp(2.6rem, 6vw, 4.6rem); color: var(--dark); margin-bottom: 20px; }
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hero p { font-size: 1.15rem; color: var(--muted); max-width: 500px; margin-bottom: 32px; }
+    .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; }
+    .hero-stats { display: flex; gap: 36px; margin-top: 44px; flex-wrap: wrap; }
+    .hero-stats strong { display: block; font-family: 'Bricolage Grotesque'; font-size: 2rem; color: var(--purple); }
+    .hero-stats span { font-size: .9rem; color: var(--muted); }
+
+    /* Ilustración del carrito */
+    .hero-visual { position: relative; aspect-ratio: 1; display: grid; place-items: center; }
+    .cart-blob {
+      width: 85%; aspect-ratio: 1; border-radius: 46% 54% 40% 60% / 55% 45% 55% 45%;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      display: grid; place-items: center; box-shadow: 0 30px 60px rgba(108, 43, 217, .35);
+      animation: morph 8s ease-in-out infinite;
+    }
+    .cart-emoji { font-size: clamp(7rem, 16vw, 11rem); filter: drop-shadow(0 12px 20px rgba(0,0,0,.25)); }
+    .float {
+      position: absolute; font-size: 3rem; background: #fff; width: 80px; height: 80px;
+      border-radius: 24px; display: grid; place-items: center; box-shadow: var(--shadow);
+      animation: floaty 4s ease-in-out infinite;
+    }
+    .f1 { top: 6%; left: 4%; }
+    .f2 { top: 12%; right: 2%; animation-delay: .8s; }
+    .f3 { bottom: 10%; left: 0; animation-delay: 1.6s; }
+    .f4 { bottom: 4%; right: 10%; animation-delay: 2.4s; }
+    @keyframes floaty { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-16px) rotate(4deg); } }
+    @keyframes morph {
+      0%,100% { border-radius: 46% 54% 40% 60% / 55% 45% 55% 45%; }
+      50% { border-radius: 58% 42% 55% 45% / 42% 58% 42% 58%; }
+    }
+
+    /* ---------- Marquee ---------- */
+    .marquee { background: var(--dark); color: var(--yellow); padding: 18px 0; overflow: hidden; transform: rotate(-1.5deg); margin: 0 -20px; }
+    .marquee-track { display: flex; gap: 48px; width: max-content; animation: scroll 25s linear infinite; font-family: 'Bricolage Grotesque'; font-size: 1.4rem; font-weight: 700; }
+    @keyframes scroll { to { transform: translateX(-50%); } }
+
+    /* ---------- Secciones ---------- */
+    section { padding: 100px 0; }
+    .section-head { text-align: center; max-width: 640px; margin: 0 auto 56px; }
+    .eyebrow { color: var(--pink); font-weight: 700; text-transform: uppercase; letter-spacing: .12em; font-size: .85rem; }
+    .section-head h2 { font-size: clamp(2rem, 4.5vw, 3rem); color: var(--dark); margin: 10px 0 14px; }
+    .section-head p { color: var(--muted); font-size: 1.05rem; }
+
+    .grid { display: grid; gap: 24px; }
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      background: var(--card); border-radius: var(--radius); padding: 32px 28px;
+      box-shadow: var(--shadow); transition: transform .25s;
+    }
+    .card:hover { transform: translateY(-6px); }
+    .card .icon {
+      width: 64px; height: 64px; border-radius: 18px; display: grid; place-items: center;
+      font-size: 2rem; margin-bottom: 20px;
+    }
+    .card h3 { font-size: 1.3rem; margin-bottom: 8px; color: var(--dark); }
+    .card p { color: var(--muted); font-size: .97rem; }
+    .bg-pink { background: #ffe1ec; } .bg-orange { background: #ffe9cc; }
+    .bg-yellow { background: #fff4c7; } .bg-purple { background: #ece2ff; }
+
+    /* Eventos */
+    .events { background: var(--dark); color: #fff; border-radius: 40px; margin: 0 16px; }
+    .events .section-head h2 { color: #fff; }
+    .events .section-head p { color: #c9c2dd; }
+    .event {
+      border-radius: var(--radius); padding: 36px 28px; min-height: 220px;
+      display: flex; flex-direction: column; justify-content: flex-end; position: relative; overflow: hidden;
+      transition: transform .25s;
+    }
+    .event:hover { transform: scale(1.03); }
+    .event .big { position: absolute; top: 18px; right: 20px; font-size: 4rem; opacity: .9; }
+    .event h3 { font-size: 1.5rem; margin-bottom: 6px; }
+    .event p { font-size: .95rem; opacity: .9; }
+    .e1 { background: linear-gradient(135deg, #ff2e7e, #ff6aa5); }
+    .e2 { background: linear-gradient(135deg, #ff8a00, #ffb347); }
+    .e3 { background: linear-gradient(135deg, #6c2bd9, #9b6bff); }
+    .e4 { background: linear-gradient(135deg, #00b894, #4ee0b8); }
+
+    /* Menú */
+    .menu-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+    .menu-item {
+      background: #fff; border-radius: var(--radius); padding: 28px 12px; text-align: center;
+      box-shadow: var(--shadow); transition: transform .25s;
+    }
+    .menu-item:hover { transform: rotate(-3deg) scale(1.05); }
+    .menu-item div { font-size: 3rem; margin-bottom: 10px; }
+    .menu-item strong { font-family: 'Bricolage Grotesque'; font-size: 1.05rem; color: var(--dark); }
+
+    /* Pasos */
+    .steps { counter-reset: step; }
+    .step { position: relative; padding-top: 56px; }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; top: 0; left: 28px; width: 56px; height: 56px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--pink), var(--orange)); color: #fff;
+      display: grid; place-items: center; font-family: 'Bricolage Grotesque'; font-size: 1.5rem; font-weight: 800;
+      transform: translateY(-50%); box-shadow: 0 8px 20px rgba(255, 46, 126, .35);
+    }
+    .step .card { padding-top: 44px; height: 100%; }
+
+    /* Paquetes */
+    .plan { display: flex; flex-direction: column; text-align: left; }
+    .plan h3 { font-size: 1.6rem; }
+    .plan .tag { color: var(--muted); margin-bottom: 20px; }
+    .plan ul { list-style: none; margin-bottom: 28px; flex: 1; }
+    .plan li { padding: 8px 0; border-bottom: 1px dashed #eee; }
+    .plan li::before { content: "✓"; color: var(--pink); font-weight: 700; margin-right: 10px; }
+    .plan .btn { justify-content: center; }
+    .plan.featured { background: var(--dark); color: #fff; transform: scale(1.04); position: relative; }
+    .plan.featured:hover { transform: scale(1.04) translateY(-6px); }
+    .plan.featured h3 { color: #fff; }
+    .plan.featured .tag { color: #c9c2dd; }
+    .plan.featured li { border-color: rgba(255,255,255,.12); }
+    .plan.featured li::before { color: var(--yellow); }
+    .ribbon {
+      position: absolute; top: -14px; right: 24px; background: var(--yellow); color: var(--dark);
+      font-weight: 700; font-size: .8rem; padding: 6px 14px; border-radius: 999px;
+    }
+
+    /* Testimonios */
+    .testimonial p { font-size: 1.05rem; color: var(--text); margin-bottom: 20px; }
+    .stars { color: var(--orange); font-size: 1.2rem; margin-bottom: 12px; }
+    .who { display: flex; align-items: center; gap: 12px; }
+    .avatar { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 1.4rem; }
+    .who strong { display: block; color: var(--dark); }
+    .who span { font-size: .85rem; color: var(--muted); }
+
+    /* Contacto */
+    .cta-box {
+      background: linear-gradient(135deg, var(--pink), var(--orange));
+      border-radius: 40px; padding: 64px 48px; color: #fff;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center;
+    }
+    .cta-box h2 { font-size: clamp(2rem, 4.5vw, 3rem); margin-bottom: 16px; }
+    .cta-box > div > p { opacity: .95; font-size: 1.1rem; margin-bottom: 24px; }
+    .contact-list { list-style: none; display: grid; gap: 10px; font-weight: 500; }
+    form { background: #fff; border-radius: var(--radius); padding: 32px; display: grid; gap: 14px; color: var(--text); }
+    form input, form select, form textarea {
+      width: 100%; padding: 14px 16px; border: 2px solid #f0eaf5; border-radius: 14px;
+      font: inherit; background: #fdfbff; transition: border-color .2s;
+    }
+    form input:focus, form select:focus, form textarea:focus { outline: none; border-color: var(--pink); }
+    form .btn { justify-content: center; width: 100%; }
+    .form-msg { display: none; text-align: center; color: #00a37a; font-weight: 600; }
+
+    /* Footer */
+    footer { padding: 48px 0; text-align: center; color: var(--muted); }
+    footer .logo { font-size: 2.2rem; margin-bottom: 8px; display: inline-block; }
+    .socials { display: flex; justify-content: center; gap: 14px; margin: 20px 0; }
+    .socials a {
+      width: 46px; height: 46px; border-radius: 50%; background: #fff; box-shadow: var(--shadow);
+      display: grid; place-items: center; font-size: 1.3rem; transition: transform .2s;
+    }
+    .socials a:hover { transform: translateY(-4px); }
+
+    /* Botón flotante WhatsApp */
+    .whatsapp {
+      position: fixed; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); right: 22px; z-index: 60; width: 60px; height: 60px; border-radius: 50%;
+      background: #25d366; color: #fff; display: grid; place-items: center; font-size: 1.8rem;
+      box-shadow: 0 10px 25px rgba(37, 211, 102, .45); animation: pulse 2.2s infinite;
+    }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+    /* Animación al hacer scroll */
+    .reveal { animation: rise .7s ease-out both; }
+    @keyframes rise { from { transform: translateY(24px); } to { transform: none; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      html { scroll-behavior: auto; }
+    }
+    .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 960px) {
+      .hero-grid, .cta-box { grid-template-columns: 1fr; }
+      .hero-visual { max-width: 420px; margin: 0 auto; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-3 { grid-template-columns: 1fr; }
+      .menu-grid { grid-template-columns: repeat(3, 1fr); }
+      .plan.featured, .plan.featured:hover { transform: none; }
+      .steps { gap: 48px; }
+    }
+    @media (max-width: 720px) {
+      .menu-toggle { display: block; }
+      .nav-links {
+        position: absolute; top: 72px; left: 0; right: 0; flex-direction: column; gap: 0;
+        background: var(--bg); padding: 8px 16px 20px; box-shadow: var(--shadow); display: none;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links li a { display: block; padding: 12px 0; }
+      .nav-inner .btn { display: none; }
+      section { padding: 72px 0; }
+      .grid-4 { grid-template-columns: 1fr; }
+      .menu-grid { grid-template-columns: repeat(2, 1fr); }
+      .cta-box { padding: 40px 20px; border-radius: 28px; }
+      .events { border-radius: 28px; margin: 0 8px; }
+      .float { width: 60px; height: 60px; font-size: 2.2rem; border-radius: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="#" class="logo">K<span>-</span>BAR</a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#por-que">¿Por qué K-BAR?</a></li>
+        <li><a href="#eventos">Eventos</a></li>
+        <li><a href="#menu">Menú</a></li>
+        <li><a href="#paquetes">Paquetes</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <a href="#contacto" class="btn btn-primary">Reservar</a>
+      <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú">☰</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="container hero-grid">
+      <div class="reveal">
+        <span class="badge">🎉 El snack bar que tu evento necesita</span>
+        <h1>Llevamos la <span class="grad">fiesta</span> en cuatro ruedas</h1>
+        <p>K-BAR es el carrito de snacks que convierte cualquier ocasión en un momento inolvidable. Botanas, dulces y bebidas listos para servir donde tú quieras.</p>
+        <div class="hero-cta">
+          <a href="#contacto" class="btn btn-primary">Cotiza tu evento →</a>
+          <a href="#menu" class="btn btn-outline">Ver menú</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong>+500</strong><span>Eventos realizados</span></div>
+          <div><strong>+30</strong><span>Snacks diferentes</span></div>
+          <div><strong>100%</strong><span>Sonrisas garantizadas</span></div>
+        </div>
+      </div>
+      <div class="hero-visual reveal">
+        <div class="cart-blob"><span class="cart-emoji">🛒</span></div>
+        <div class="float f1">🍿</div>
+        <div class="float f2">🍭</div>
+        <div class="float f3">🌮</div>
+        <div class="float f4">🥤</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Marquee -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>🍿 PALOMITAS</span><span>★</span><span>🍬 DULCES</span><span>★</span><span>🌽 ESQUITES</span><span>★</span><span>🥤 BEBIDAS</span><span>★</span><span>🍩 POSTRES</span><span>★</span><span>🥨 BOTANAS</span><span>★</span>
+      <span>🍿 PALOMITAS</span><span>★</span><span>🍬 DULCES</span><span>★</span><span>🌽 ESQUITES</span><span>★</span><span>🥤 BEBIDAS</span><span>★</span><span>🍩 POSTRES</span><span>★</span><span>🥨 BOTANAS</span><span>★</span>
+    </div>
+  </div>
+
+  <!-- Por qué -->
+  <section id="por-que">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">¿Por qué K-BAR?</span>
+        <h2>Más que snacks, una experiencia</h2>
+        <p>Nos encargamos de todo para que tú solo disfrutes con tus invitados.</p>
+      </div>
+      <div class="grid grid-4">
+        <div class="card reveal"><div class="icon bg-pink">🎨</div><h3>Diseño llamativo</h3><p>Un carrito que se convierte en el centro de atención de tu evento.</p></div>
+        <div class="card reveal"><div class="icon bg-orange">🚚</div><h3>Llegamos a ti</h3><p>Montaje y desmontaje incluidos, sin que te preocupes por nada.</p></div>
+        <div class="card reveal"><div class="icon bg-yellow">✨</div><h3>Personalizable</h3><p>Adaptamos colores, menú y decoración a la temática de tu evento.</p></div>
+        <div class="card reveal"><div class="icon bg-purple">🙌</div><h3>Staff amigable</h3><p>Personal atento que atiende a tus invitados con la mejor actitud.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Eventos -->
+  <section id="eventos" class="events">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Para cualquier ocasión</span>
+        <h2>¿Tienes un evento? Nosotros llevamos el sabor</h2>
+        <p>Desde fiestas pequeñas hasta grandes celebraciones.</p>
+      </div>
+      <div class="grid grid-4">
+        <div class="event e1 reveal"><span class="big">💍</span><h3>Bodas</h3><p>Un detalle dulce que tus invitados recordarán.</p></div>
+        <div class="event e2 reveal"><span class="big">🎂</span><h3>Cumpleaños</h3><p>Diversión para chicos y grandes.</p></div>
+        <div class="event e3 reveal"><span class="big">💼</span><h3>Corporativos</h3><p>Activaciones de marca y eventos de empresa.</p></div>
+        <div class="event e4 reveal"><span class="big">🎓</span><h3>Escolares</h3><p>Graduaciones, kermeses y festivales.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Menú -->
+  <section id="menu">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Nuestro menú</span>
+        <h2>Antojos para todos los gustos</h2>
+        <p>Una selección variada de snacks dulces y salados. ¡Arma tu combinación favorita!</p>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-item reveal"><div>🍿</div><strong>Palomitas</strong></div>
+        <div class="menu-item reveal"><div>🍭</div><strong>Dulces</strong></div>
+        <div class="menu-item reveal"><div>🌽</div><strong>Esquites</strong></div>
+        <div class="menu-item reveal"><div>🥨</div><strong>Botanas</strong></div>
+        <div class="menu-item reveal"><div>🍩</div><strong>Postres</strong></div>
+        <div class="menu-item reveal"><div>🥤</div><strong>Bebidas</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cómo funciona -->
+  <section style="padding-top: 0;">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Así de fácil</span>
+        <h2>Reserva en 3 pasos</h2>
+      </div>
+      <div class="grid grid-3 steps">
+        <div class="step reveal"><div class="card"><h3>Cuéntanos tu idea</h3><p>Envíanos la fecha, el lugar y el tipo de evento.</p></div></div>
+        <div class="step reveal"><div class="card"><h3>Elige tu paquete</h3><p>Te ayudamos a escoger el menú ideal para tus invitados.</p></div></div>
+        <div class="step reveal"><div class="card"><h3>¡A disfrutar!</h3><p>Llegamos, montamos y servimos. Tú solo diviértete.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Paquetes -->
+  <section id="paquetes" style="padding-top: 0;">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Paquetes</span>
+        <h2>Elige el tamaño de tu fiesta</h2>
+        <p>Opciones flexibles que se adaptan a tu evento.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="card plan reveal">
+          <h3>Básico</h3>
+          <p class="tag">Ideal para reuniones pequeñas</p>
+          <ul><li>Carrito K-BAR</li><li>3 tipos de snacks</li><li>1 persona de staff</li><li>Montaje incluido</li></ul>
+          <a href="#contacto" class="btn btn-outline">Cotizar</a>
+        </div>
+        <div class="card plan featured reveal">
+          <span class="ribbon">⭐ Más popular</span>
+          <h3>Fiesta</h3>
+          <p class="tag">Perfecto para celebraciones</p>
+          <ul><li>Carrito K-BAR decorado</li><li>5 tipos de snacks</li><li>Bebidas incluidas</li><li>2 personas de staff</li><li>Montaje y desmontaje</li></ul>
+          <a href="#contacto" class="btn btn-primary">Cotizar</a>
+        </div>
+        <div class="card plan reveal">
+          <h3>Premium</h3>
+          <p class="tag">La experiencia completa</p>
+          <ul><li>Diseño personalizado</li><li>Menú ilimitado</li><li>Bebidas y postres</li><li>Staff completo</li><li>Branding de tu marca</li></ul>
+          <a href="#contacto" class="btn btn-outline">Cotizar</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonios -->
+  <section style="padding-top: 0;">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Testimonios</span>
+        <h2>Lo que dicen nuestros clientes</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="card testimonial reveal">
+          <div class="stars">★★★★★</div>
+          <p>"El carrito fue el éxito de la fiesta. ¡Todos querían tomarse fotos con él!"</p>
+          <div class="who"><div class="avatar bg-pink">😊</div><div><strong>Cliente feliz</strong><span>Cumpleaños</span></div></div>
+        </div>
+        <div class="card testimonial reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Súper puntuales y atentos. Los invitados de la boda quedaron encantados."</p>
+          <div class="who"><div class="avatar bg-orange">💕</div><div><strong>Pareja de novios</strong><span>Boda</span></div></div>
+        </div>
+        <div class="card testimonial reveal">
+          <div class="stars">★★★★★</div>
+          <p>"Perfecto para nuestro evento de empresa. Sin duda los volveremos a contratar."</p>
+          <div class="who"><div class="avatar bg-purple">🏢</div><div><strong>Equipo corporativo</strong><span>Evento de empresa</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contacto -->
+  <section id="contacto" style="padding-top: 0;">
+    <div class="container">
+      <div class="cta-box reveal">
+        <div>
+          <h2>¿Listo para endulzar tu evento?</h2>
+          <p>Escríbenos y recibe una cotización sin compromiso. ¡Las fechas se llenan rápido!</p>
+          <ul class="contact-list">
+            <li>📍 Servicio en tu ciudad y alrededores</li>
+            <li>📞 (000) 000 0000</li>
+            <li>✉️ hola@kbar.com</li>
+          </ul>
+        </div>
+        <form id="contactForm">
+          <input type="text" placeholder="Tu nombre" required>
+          <input type="tel" placeholder="Teléfono o WhatsApp" required>
+          <select required>
+            <option value="" disabled selected>Tipo de evento</option>
+            <option>Boda</option>
+            <option>Cumpleaños</option>
+            <option>Corporativo</option>
+            <option>Escolar</option>
+            <option>Otro</option>
+          </select>
+          <input type="date" aria-label="Fecha del evento">
+          <textarea rows="3" placeholder="Cuéntanos sobre tu evento"></textarea>
+          <button type="submit" class="btn btn-primary">Solicitar cotización 🎉</button>
+          <p class="form-msg" id="formMsg">¡Gracias! Te contactaremos muy pronto.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <a href="#" class="logo">K<span style="color: var(--pink)">-</span>BAR</a>
+      <p>Snacks sobre ruedas para cualquier ocasión.</p>
+      <div class="socials">
+        <a href="#" aria-label="Instagram">📸</a>
+        <a href="#" aria-label="Facebook">👍</a>
+        <a href="#" aria-label="TikTok">🎵</a>
+      </div>
+      <p style="font-size: .85rem;">© 2026 K-BAR. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <a href="#contacto" class="whatsapp" aria-label="Contactar por WhatsApp">💬</a>
+
+  <script>
+    // Menú móvil
+    const toggle = document.getElementById('menuToggle');
+    const links = document.getElementById('navLinks');
+    toggle.addEventListener('click', () => links.classList.toggle('open'));
+    links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => links.classList.remove('open')));
+
+    // Formulario (demo)
+    document.getElementById('contactForm').addEventListener('submit', e => {
+      e.preventDefault();
+      document.getElementById('formMsg').style.display = 'block';
+      e.target.reset();
+    });
+  </script>
+</body>
+</html>
